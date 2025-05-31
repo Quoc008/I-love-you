@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>I Love You Rain + Heart Fireworks</title>
+  <style>
+    body {
+      margin: 0;
+      background: #000; /* 👈 Nền đen */
+      overflow: hidden;
+    }
+
+    canvas {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+<canvas id="loveCanvas"></canvas>
+
+<script>
+  const canvas = document.getElementById('loveCanvas');
+  const ctx = canvas.getContext('2d');
+
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  const text = "I love You";
+  const fontSize = 22;
+  const columns = Math.floor(canvas.width / fontSize);
+  const drops = Array(columns).fill(1);
+
+  const heartColors = ['#ff3399', '#ff69b4', '#ff66cc', '#ff1493']; // Các màu trái tim
+  const textColor = '#ff69b4'; // 👈 Màu chữ hồng cố định
+  let hearts = [];
+
+  function draw() {
+    // Nền mờ đen để tạo vệt rơi
+    ctx.fillStyle = "rgba(0, 0, 0, 0.1)";
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    ctx.fillStyle = textColor;
+    ctx.font = fontSize + "px Comic Sans MS";
+
+    for (let i = 0; i < drops.length; i++) {
+      const x = i * fontSize;
+      const y = drops[i] * fontSize;
+
+      ctx.fillText(text, x, y);
+
+      if (y > canvas.height && Math.random() > 0.985) {
+        drops[i] = 0;
+      }
+
+      drops[i] += 1.5; // 👈 Tốc độ rơi nhanh
+    }
+
+    // Vẽ pháo hoa trái tim
+    hearts.forEach((heart, index) => {
+      ctx.fillStyle = heart.color;
+      ctx.font = `${heart.size}px serif`;
+      ctx.fillText('❤️', heart.x, heart.y);
+      heart.x += heart.vx;
+      heart.y += heart.vy;
+      heart.alpha -= 0.1; // 👈 Tan biến nhanh sau 1s
+      if (heart.alpha <= 0) {
+        hearts.splice(index, 1);
+      }
+    });
+  }
+
+  setInterval(draw, 66);
+
+  window.addEventListener('resize', () => {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  });
+
+  canvas.addEventListener('click', (e) => {
+    createHeartExplosion(e.clientX, e.clientY);
+  });
+
+  function createHeartExplosion(x, y) {
+    for (let i = 0; i < 20; i++) {
+      const angle = Math.random() * Math.PI * 2;
+      const speed = Math.random() * 3 + 1;
+      hearts.push({
+        x: x,
+        y: y,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed,
+        alpha: 1,
+        size: Math.random() * 16 + 10,
+        color: heartColors[Math.floor(Math.random() * heartColors.length)]
+      });
+    }
+  }
+</script>
+</body>
+</html>
